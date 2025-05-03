@@ -1,5 +1,71 @@
 # Спринт 6
 
+## Порядок запуска
+
+Я использовал [uv](https://docs.astral.sh/uv/guides/install-python/) для управления средами python. Синтаксис манифеста аналогичен Poetry, но сам инструмент быстрее. Можно использовать и Poetry (но я не тестировал).
+
+1. Запускаем
+
+```bash
+minikube start --addons=metrics-server
+```
+
+```console
+😄  minikube v1.35.0 on Darwin 15.2 (arm64)
+✨  Using the docker driver based on existing profile
+👍  Starting "minikube" primary control-plane node in "minikube" cluster
+🚜  Pulling base image v0.0.46 ...
+🏃  Updating the running docker "minikube" container ...
+🐳  Preparing Kubernetes v1.32.0 on Docker 27.4.1 ...
+🔎  Verifying Kubernetes components...
+    ▪ Using image gcr.io/k8s-minikube/storage-provisioner:v5
+    ▪ Using image registry.k8s.io/metrics-server/metrics-server:v0.7.2
+🌟  Enabled addons: default-storageclass, storage-provisioner, metrics-server
+
+❗  /Users/pndvg/.local/bin/kubectl is version 1.30.7, which may have incompatibilities with Kubernetes 1.32.0.
+    ▪ Want kubectl v1.32.0? Try 'minikube kubectl -- get pods -A'
+🏄  Done! kubectl is now configured to use "minikube" cluster and "default" namespace by default
+```
+
+```bash
+kubectl get pods -n kube-system | grep metrics-server
+```
+
+```console
+metrics-server-7fbb699795-62tsg    1/1     Running   2 (5d15h ago)   5d17h
+```
+
+2. Применяем манифест горизонтального автомасштабирования
+
+```yaml
+cd manifests/
+kubectl apply -f hpa-memory.yaml
+kubectl get hpa
+```
+
+```console
+NAME                          REFERENCE                            TARGETS                 MINPODS   MAXPODS   REPLICAS   AGE
+scalable-pod-hpa-mem          Deployment/scalable-pod              memory: <unknown>/80%   1         10        1          5d16h
+scalable-pod-hpa-rps          Deployment/scalable-pod              <unknown>/10 (avg)      1         10        1          5d16h
+scalable-pod-identifier-hpa   Deployment/scalable-pod-identifier   memory: <unknown>/80%   1         10        0          5d18h
+```
+
+```bash
+manifests % kubectl apply -f deployment.yaml               
+deployment.apps/scalable-pod configured
+manifests % kubectl apply -f service.yaml 
+service/scalable-pod configured
+manifests % kubectl apply -f hpa-memory.yaml 
+horizontalpodautoscaler.autoscaling/scalable-pod-hpa-mem unchanged
+% kubectl delete hpa scalable-pod-hpa-rps
+horizontalpodautoscaler.autoscaling "scalable-pod-hpa-rps" deleted
+% kubectl delete hpa scalable-pod-identifier-hpa
+horizontalpodautoscaler.autoscaling "scalable-pod-identifier-hpa" deleted
+% kubectl get hpa
+NAME                   REFERENCE                 TARGETS          MINPODS   MAXPODS   REPLICAS   AGE
+scalable-pod-hpa-mem   Deployment/scalable-pod   memory: 4%/80%   1         10        1          5d17h
+```
+
 ## Описание кейса
 
 Компания предоставляет агрегационные услуги в сфере страхования. Она работает с частными и корпоративными клиентами:

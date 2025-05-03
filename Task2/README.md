@@ -1,4 +1,4 @@
-## Задание 2. Динамическое масштабирование контейнеров
+# Задание 2. Динамическое масштабирование контейнеров
 
 Сейчас сервисы InsureTech развёрнуты в Kubernetes. Каждый из них развёрнут в определённом количестве экземпляров.
 
@@ -51,6 +51,8 @@
 
     ```minikube dashboard```
     Сделайте скриншоты дашборда или выгрузите логи, которые покажут, что количество реплик базы данных поменялось в ответ на сгенерированную нагрузку. Загрузите их в директорию Task2 в рамках пул-реквеста.
+
+    ![1746207117020](image/README/1746207117020.png)
 
 ### Дополнительная часть задания: динамическая маршрутизация на основании показателей количества запросов в секунду
 
@@ -149,6 +151,8 @@ minikube service <имя сервиса> --url
 
 Сделайте скриншоты интерфейса с метриками и загрузите их в директорию **Task2**.
 
+![1746211873380](image/README/1746211873380.png)
+
 5. Теперь необходимо настроить Prometheus Adapter для использования метрик Prometheus в Horizontal Pod Autoscaler (HPA). Prometheus Adapter служит мостом между Kubernetes и Prometheus. Он позволяет Kubernetes использовать метрики Prometheus для масштабирования подов. Чтобы настроить Prometheus Adapter:
 
 a. Когда используете Helm для установки или обновления Prometheus Adapter, предоставьте значения, которые переопределяют базовую конфигурацию. Создайте файл `values.yaml` и включите туда определение для prometheus-adapter:
@@ -177,6 +181,12 @@ b. Установите Prometheus Adapter при помощи команды:
 c. Чтобы убедиться, что кастомная метрика `http_requests_per_second` стала доступной, воспользуйтесь командой:
 
    `kubectl get --raw /apis/custom.metrics.k8s.io/v1beta1`
+
+Результат:
+
+```console
+{"kind":"APIResourceList","apiVersion":"v1","groupVersion":"custom.metrics.k8s.io/v1beta1","resources":[{"name":"namespaces/http_requests_per_second","singularName":"","namespaced":false,"kind":"MetricValueList","verbs":["get"]},{"name":"pods/http_requests_per_second","singularName":"","namespaced":true,"kind":"MetricValueList","verbs":["get"]}]}
+```
 
 6. Обновите манифест Horizontal Pod Autoscaler. Укажите там, что масштабирование нужно производить на базе новой метрики — `http_requests_per_second`. Вот пример манифеста:
 

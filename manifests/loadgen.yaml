@@ -1,0 +1,20 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: loadgen
+spec:
+  parallelism: 1
+  completions: 1
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+      - name: curl
+        image: appropriate/curl
+        command: ["/bin/sh","-c"]
+        args:
+        - |
+          while true; do
+            curl -s http://scalable-pod.default.svc.cluster.local/health > /dev/null
+            sleep 0.1        # 10 запросов/с
+          done
