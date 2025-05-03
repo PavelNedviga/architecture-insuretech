@@ -3,10 +3,13 @@ apiVersion: v1
 kind: Service
 metadata:
   name: scaletestapp-svc
+  labels:
+    prometheus-monitored: "true"
 spec:
   selector:
     app: scaletestapp
   ports:
-  - name: tcp
+  - name: http
+    protocol: TCP
     port: 8080
     targetPort: 8080
