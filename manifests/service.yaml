@@ -1,0 +1,17 @@
+# service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: scalable-pod
+  labels:
+    app: scalable-pod
+    prometheus-monitored: "true"
+spec:
+  selector:
+    app: scalable-pod
+  ports:
+  - name: http
+    port: 8080
+    targetPort: http
+    nodePort: 30080
+  type: NodePort

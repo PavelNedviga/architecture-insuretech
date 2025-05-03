@@ -1,0 +1,36 @@
+# Уровень корневых запросов.
+# Все операции, которые были в REST, перекрываются
+# одной точкой входа `client(id)` + специализированные
+# field-query для документов / родственников, если нужно
+# запрашивать их отдельно.
+
+type Query {
+  client(id: ID!): Client
+  clientDocuments(id: ID!): [Document!]!
+  clientRelatives(id: ID!): [Relative!]!
+}
+
+# --------- Сущности --------------------------------
+
+type Client {
+  id: ID!
+  name: String
+  age: Int
+  documents: [Document!]! # Коллекция документов клиента. Будет извлечена только если запрошена в GraphQL-selection.
+  relatives: [Relative!]! # Родственники клиента.
+}
+
+type Document {
+  id: ID!
+  type: String
+  number: String
+  issueDate: String
+  expiryDate: String
+}
+
+type Relative {
+  id: ID!
+  relationType: String
+  name: String
+  age: Int
+}
