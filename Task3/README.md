@@ -22,3 +22,5 @@
    - Решите, будете ли вы использовать паттерн Transactional Outbox.
 
 Когда схема будет готова, загрузите её в директорию Task3 в рамках пул-реквеста
+
+Смотри [схему](InsureTech_C4_Container_Diagram.drawio) на вкладке `InsureTechUpdated`.
